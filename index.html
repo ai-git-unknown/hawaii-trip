@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oahu Circle Island Drive — Route Guide</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --ocean: #1A6FA8; --sand: #F5F0E8; --paper: #FDFCF9;
+    --ink: #1A1A1A; --ink2: #4A4A4A; --ink3: #8A8A8A;
+    --border: rgba(0,0,0,0.09);
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--sand); color: var(--ink); min-height: 100vh; line-height: 1.6; }
+
+  /* HERO */
+  .hero { background: var(--ocean); color: #fff; padding: 40px 32px 36px; position: relative; overflow: hidden; }
+  .hero::before { content:''; position:absolute; inset:0; background: repeating-linear-gradient(-45deg, transparent, transparent 40px, rgba(255,255,255,0.03) 40px, rgba(255,255,255,0.03) 41px); pointer-events:none; }
+  .hero-eyebrow { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.55); margin-bottom:10px; }
+  .hero h1 { font-size: clamp(24px,5vw,38px); font-weight:600; line-height:1.15; margin-bottom:8px; letter-spacing:-0.5px; }
+  .hero-sub { font-size:14px; color:rgba(255,255,255,0.7); max-width:520px; line-height:1.5; }
+  .hero-stats { display:flex; flex-wrap:wrap; gap:20px; margin-top:24px; }
+  .hero-stat { display:flex; flex-direction:column; gap:2px; }
+  .hero-stat-val { font-size:22px; font-weight:600; color:#fff; line-height:1; }
+  .hero-stat-label { font-size:10px; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:0.08em; font-family:'DM Mono',monospace; }
+  .hero-divider { width:1px; height:32px; background:rgba(255,255,255,0.2); align-self:center; }
+
+  /* PROGRESS BAR */
+  .progress-bar { display:flex; height:5px; }
+  .pb-east  { background:#378ADD; flex:2; }
+  .pb-wind  { background:#1D9E75; flex:2; }
+  .pb-north { background:#EF9F27; flex:1.3; }
+  .pb-ret   { background:#888780; flex:1.5; }
+
+  /* LEGEND */
+  .legend { display:flex; flex-wrap:wrap; gap:14px; padding:14px 20px; background:var(--paper); border-bottom:1px solid var(--border); }
+  .leg-item { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--ink2); font-family:'DM Mono',monospace; }
+  .leg-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+  /* MAP */
+  #map-wrap { background: var(--paper); border-bottom: 1px solid var(--border); }
+  #map { height: 460px; width: 100%; }
+  .map-label { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink3); padding: 10px 20px 8px; }
+
+  /* MAIN */
+  .main { max-width: 720px; margin: 0 auto; padding: 0 20px 60px; }
+
+  /* SECTION HEADER */
+  .section-hd { display:flex; align-items:center; gap:10px; padding:26px 0 10px; }
+  .section-pip { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  .section-name { font-family:'DM Mono',monospace; font-size:11px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink3); }
+  .section-time { margin-left:auto; font-family:'DM Mono',monospace; font-size:11px; color:var(--ink3); }
+
+  /* TIMELINE */
+  .timeline { display:flex; flex-direction:column; }
+  .leg { display:flex; gap:0; align-items:stretch; }
+  .leg-left { display:flex; flex-direction:column; align-items:center; width:48px; flex-shrink:0; padding-top:2px; }
+  .leg-num { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; font-family:'DM Mono',monospace; flex-shrink:0; border:1.5px solid transparent; }
+  .leg-connector { flex:1; width:2px; margin:3px 0; min-height:10px; border-radius:1px; }
+  .leg-body { flex:1; padding:0 0 18px 4px; }
+  .leg-route { font-size:14px; font-weight:500; color:var(--ink); line-height:1.3; padding-top:4px; }
+  .leg-details { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:5px; }
+  .leg-dist { font-size:12px; color:var(--ink3); font-family:'DM Mono',monospace; }
+  .leg-duration { font-size:12px; font-weight:600; font-family:'DM Mono',monospace; }
+  .leg-clock { font-size:11px; color:var(--ink3); font-family:'DM Mono',monospace; }
+  .leg-road-pill { font-size:10px; font-family:'DM Mono',monospace; padding:2px 7px; border-radius:3px; background:rgba(0,0,0,0.06); color:var(--ink2); letter-spacing:0.04em; }
+
+  .east .leg-num   { background:#E6F1FB; border-color:#B5D4F4; color:#0C447C; }
+  .wind .leg-num   { background:#E1F5EE; border-color:#9FE1CB; color:#085041; }
+  .north .leg-num  { background:#FAEEDA; border-color:#FAC775; color:#633806; }
+  .ret .leg-num    { background:#F1EFE8; border-color:#D3D1C7; color:#444441; }
+  .east .leg-connector  { background:#85B7EB; }
+  .wind .leg-connector  { background:#5DCAA5; }
+  .north .leg-connector { background:#EF9F27; }
+  .ret .leg-connector   { background:#B4B2A9; }
+  .east .leg-duration  { color:#185FA5; }
+  .wind .leg-duration  { color:#0F6E56; }
+  .north .leg-duration { color:#854F0B; }
+  .ret .leg-duration   { color:#5F5E5A; }
+
+  /* TOTAL */
+  .total-row { display:flex; align-items:center; gap:16px; padding:20px; background:var(--ink); color:#fff; border-radius:10px; margin-top:8px; }
+  .total-label { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:rgba(255,255,255,0.5); flex:1; }
+  .total-val { font-size:22px; font-weight:600; letter-spacing:-0.3px; }
+  .total-sub { font-family:'DM Mono',monospace; font-size:11px; color:rgba(255,255,255,0.45); }
+
+  /* TIPS */
+  .tips { margin-top:24px; display:flex; flex-direction:column; gap:10px; }
+  .tip-card { background:var(--paper); border:1px solid var(--border); border-radius:8px; padding:13px 16px; display:flex; gap:12px; align-items:flex-start; }
+  .tip-icon { font-size:17px; line-height:1; flex-shrink:0; margin-top:1px; }
+  .tip-text { font-size:13px; color:var(--ink2); line-height:1.55; }
+  .tip-text strong { color:var(--ink); font-weight:600; display:block; margin-bottom:2px; }
+
+  .footer { text-align:center; padding:24px; font-size:11px; font-family:'DM Mono',monospace; color:var(--ink3); letter-spacing:0.06em; }
+
+  /* LEAFLET custom popup */
+  .leaflet-popup-content-wrapper { border-radius: 8px; font-family: 'DM Sans', sans-serif; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+  .leaflet-popup-content { margin: 10px 14px; font-size: 13px; line-height: 1.5; min-width: 160px; }
+  .popup-name { font-weight: 600; font-size: 14px; color: #1A1A1A; margin-bottom: 4px; }
+  .popup-row { display: flex; gap: 8px; font-size: 12px; color: #5A5A5A; font-family: 'DM Mono', monospace; margin-top: 3px; flex-wrap: wrap; }
+  .popup-badge { padding: 2px 7px; border-radius: 3px; font-size: 11px; font-weight: 500; }
+
+  @media (max-width:480px) {
+    .hero { padding:28px 16px 24px; }
+    .hero-divider { display:none; }
+    .main { padding:0 12px 48px; }
+    #map { height: 320px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-eyebrow">Oahu · Hawaii · Circle Island Drive</div>
+  <h1>Drive the whole island,<br>no stops needed.</h1>
+  <p class="hero-sub">A counterclockwise loop from Waikiki — east coast, windward, North Shore, and back. Pure drive times only.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><span class="hero-stat-val">~210 km</span><span class="hero-stat-label">Total distance</span></div>
+    <div class="hero-divider"></div>
+    <div class="hero-stat"><span class="hero-stat-val">3.5–4.5 hrs</span><span class="hero-stat-label">Drive time only</span></div>
+    <div class="hero-divider"></div>
+    <div class="hero-stat"><span class="hero-stat-val">6:00 AM</span><span class="hero-stat-label">Recommended start</span></div>
+    <div class="hero-divider"></div>
+    <div class="hero-stat"><span class="hero-stat-val">~9:30 AM</span><span class="hero-stat-label">Back in Waikiki</span></div>
+  </div>
+</div>
+
+<div class="progress-bar">
+  <div class="pb-east"></div><div class="pb-wind"></div><div class="pb-north"></div><div class="pb-ret"></div>
+</div>
+
+<div class="legend">
+  <div class="leg-item"><div class="leg-dot" style="background:#378ADD"></div>East coast — Hwy 72</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#1D9E75"></div>Windward coast — Hwy 83</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#EF9F27"></div>North Shore</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#888780"></div>Return — H-2 / H-1</div>
+</div>
+
+<!-- MAP -->
+<div id="map-wrap">
+  <div class="map-label">Interactive route map — click any marker for details</div>
+  <div id="map"></div>
+</div>
+
+<div class="main">
+
+  <!-- EAST COAST -->
+  <div class="section-hd">
+    <div class="section-pip" style="background:#378ADD"></div>
+    <span class="section-name">East coast — Hwy 72 (Kalaniana'ole)</span>
+    <span class="section-time">~53 min · ~37 km</span>
+  </div>
+  <div class="timeline">
+    <div class="leg east">
+      <div class="leg-left"><div class="leg-num">S</div><div class="leg-connector"></div></div>
+      <div class="leg-body">
+        <div class="leg-route">Waikiki → Diamond Head</div>
+        <div class="leg-details"><span class="leg-dist">~5 km</span><span class="leg-duration">10 min</span><span class="leg-clock">Depart 6:00 AM · arrive 6:10</span><span class="leg-road-pill">H-1 East</span></div>
+      </div>
+    </div>
+    <div class="leg east">
+      <div class="leg-left"><div class="leg-num">1</div><div class="leg-connector"></div></div>
+      <div class="leg-body">
+        <div class="leg-route">Diamond Head → Hanauma Bay</div>
+        <div class="leg-details"><span class="leg-dist">~11 km</span><span class="leg-duration">15 min</span><span class="leg-clock">6:10 → 6:25</span><span class="leg-road-pill">Hwy 72</span></div>
+      </div>
+    </div>
+    <div class="leg east">
+      <div class="leg-left"><div class="leg-num">2</div><div class="leg-connector"></div></div>
+      <div class="leg-body">
+        <div class="leg-route">Hanauma Bay → Halona Blowhole</div>
+        <div class="leg-details"><span class="leg-dist">~3 km</span><span class="leg-duration">5 min</span><span class="leg-clock">6:25 → 6:30</span><span class="leg-road-pill">Hwy 72</span></div>
+      </div>
+    </div>
+    <div class="leg east">
+      <div class="leg-left"><div class="leg-num">3</div><div class="leg-connector"></div></div>
+      <div class="leg-body">
+        <div class="leg-route">Halona Blowhole → Sandy Beach / Makapu'u</div>
+        <div class="leg-details"><span class="leg-dist">~5 km</span><span class="leg-duration">8 min</span><span class="leg-clock">6:30 → 6:38</span><span class="leg-road-pill">Hwy 72</span></div>
+      </div>
+    </div>
+    <div class="leg east">
+      <div class="leg-left"><div class="leg-num">4</div><div class="leg-connector" style="background:transparent"></div></div>
+      <div class="leg-body">
+        <div class="leg-route">Makapu'u → Waimanalo / Kailua</div>
+        <div class="leg-details"><span class="leg-dist">~13 km</span><span class="leg-duration">15 min</span><span class="leg-clock">6:38 → 6:53</span><span class="leg-road-pill">Hwy 72</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WINDWARD -->
+  <div class="section-hd">
+    <div class="section-pip" style="background:#1D9E75"></div>
+    <span class="section-name">Windward coast — Hwy 83</span>
+    <span class="section-time">~63 min · ~55 km</span>
+  </div>
+  <div class="timeline">
+    <div class="leg wind">
+      <div class="leg-left"><div class="leg-num">5</div><div class="leg-connector"></div></div>
+      <div class="leg-body">
+        <div class="leg-route">Kailua → Kāne'ohe (Byodo-In area)</div>
+        <div class="leg-details"><span class="leg-dist">~13 km</span><span class="leg-duration">18 min</span><span class="leg-clock">6:53 → 7:11</span><span class="leg-road-pill">Hwy 61 / 83</span></div>
+      </div>
+    </div>
+    <div class="leg wind">
+      <div class="leg-left"><div class="leg-num">6</div><div class="leg-connector"></div></div>
+      <div class="leg-body">
+        <div class="leg-route">Kāne'ohe → Kualoa Regional Park</div>
+        <div class="leg-details"><span class="leg-dist">~18 km</span><span class="leg-duration">20 min</span><span class="leg-clock">7:11 → 7:31</span><span class="leg-road-pill">Hwy 83 N</span></div>
+      </div>
+    </div>
+    <div class="leg wind">
+      <div class="leg-left"><div class="leg-num">7</div><div class="leg-connector" style="background:transparent"></div></div>
+      <div class="leg-body">
+        <div class="leg-route">Kualoa → Kahuku (shrimp trucks area)</div>
+        <div class="leg-details"><span class="leg-dist">~24 km</span><span class="leg-duration">25 min</span><span class="leg-clock">7:31 → 7:56</span><span class="leg-road-pill">Hwy 83 N</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NORTH SHORE -->
+  <div class="section-hd">
+    <div class="section-pip" style="background:#EF9F27"></div>
+    <span class="section-name">North Shore</span>
+    <span class="section-time">~45 min · ~42 km</span>
+  </div>
+  <div class="timeline">
+    <div class="leg north">
+      <div class="leg-left"><div class="leg-num">8</div><div class="leg-connector"></div></div>
+      <div class="leg-body">
+        <div class="leg-route">Kahuku → Waimea Bay</div>
+        <div class="leg-details"><span class="leg-dist">~16 km</span><span class="leg-duration">15 min</span><span class="leg-clock">7:56 → 8:11</span><span class="leg-road-pill">Hwy 83 W</span></div>
+      </div>
+    </div>
+    <div class="leg north">
+      <div class="leg-left"><div class="leg-num">9</div><div class="leg-connector"></div></div>
+      <div class="leg-body">
+        <div class="leg-route">Waimea Bay → Sunset Beach / Pipeline</div>
+        <div class="leg-details"><span class="leg-dist">~6 km</span><span class="leg-duration">8 min</span><span class="leg-clock">8:11 → 8:19</span><span class="leg-road-pill">Kamehameha Hwy</span></div>
+      </div>
+    </div>
+    <div class="leg north">
+      <div class="leg-left"><div class="leg-num">10</div><div class="leg-connector"></div></div>
+      <div class="leg-body">
+        <div class="leg-route">Sunset Beach → Haleiwa Town</div>
+        <div class="leg-details"><span class="leg-dist">~8 km</span><span class="leg-duration">10 min</span><span class="leg-clock">8:19 → 8:29</span><span class="leg-road-pill">Kamehameha Hwy</span></div>
+      </div>
+    </div>
+    <div class="leg north">
+      <div class="leg-left"><div class="leg-num">11</div><div class="leg-connector" style="background:transparent"></div></div>
+      <div class="leg-body">
+        <div class="leg-route">Haleiwa → Dole Plantation</div>
+        <div class="leg-details"><span class="leg-dist">~11 km</span><span class="leg-duration">12 min</span><span class="leg-clock">8:29 → 8:41</span><span class="leg-road-pill">Kamehameha Hwy</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RETURN -->
+  <div class="section-hd">
+    <div class="section-pip" style="background:#888780"></div>
+    <span class="section-name">Return to Waikiki — H-2 S → H-1 E</span>
+    <span class="section-time">~45–60 min · ~56 km</span>
+  </div>
+  <div class="timeline">
+    <div class="leg ret">
+      <div class="leg-left"><div class="leg-num">12</div><div class="leg-connector"></div></div>
+      <div class="leg-body">
+        <div class="leg-route">Dole Plantation → Waikiki</div>
+        <div class="leg-details"><span class="leg-dist">~56 km</span><span class="leg-duration">45–60 min</span><span class="leg-clock">8:41 → ~9:30 AM</span><span class="leg-road-pill">H-2 S → H-1 E</span></div>
+      </div>
+    </div>
+    <div class="leg ret">
+      <div class="leg-left"><div class="leg-num">F</div><div class="leg-connector" style="background:transparent"></div></div>
+      <div class="leg-body">
+        <div class="leg-route">Back in Waikiki</div>
+        <div class="leg-details"><span class="leg-duration">~9:30 AM if no stops</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOTAL -->
+  <div class="total-row">
+    <span class="total-label">Total loop</span>
+    <div>
+      <div class="total-val">~3.5 – 4.5 hrs</div>
+      <div class="total-sub">~210 kmles · no stops · starts 6:00 AM</div>
+    </div>
+  </div>
+
+  <!-- TIPS -->
+  <div class="tips">
+    <div class="tip-card">
+      <div class="tip-icon">↺</div>
+      <div class="tip-text"><strong>Go counterclockwise</strong>East coast first keeps you away from Honolulu morning traffic. Food trucks on the North Shore are on the ocean side of the highway going this direction.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">⏰</div>
+      <div class="tip-text"><strong>Start early — 6:00 AM is ideal</strong>Oahu's H-1 freeway rivals mainland rush hours. By 6 AM it's clear. The North Shore two-lane road also gets congested on weekends from mid-morning.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">⛽</div>
+      <div class="tip-text"><strong>Fill up before leaving Waikiki</strong>Gas stations are sparse along the east coast and North Shore. Fill the tank at the start.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">⚠</div>
+      <div class="tip-text"><strong>The road doesn't fully circle the island</strong>The highway dead-ends at Ka'ena Point on the northwest tip. This route cuts back inland via H-2 — the standard way to complete the loop.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">🚗</div>
+      <div class="tip-text"><strong>Best car for this drive</strong>A Jeep Wrangler or convertible for the coastal sections. Book your rental early — demand is high and prices spike close to your travel date.</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">Oahu · Counterclockwise Circle Drive · Drive times only</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// All stops with coords, labels, segment colour, drive info
+const stops = [
+  { id:'S',  lat:21.2793, lng:-157.8290, name:'Waikiki (Start)',         color:'#378ADD', seg:'East coast',     dist:'—',     dur:'Depart 6:00 AM', clock:'',             road:'H-1 East' },
+  { id:'1',  lat:21.2612, lng:-157.8044, name:'Diamond Head',            color:'#378ADD', seg:'East coast',     dist:'~5 km', dur:'10 min',         clock:'6:00 → 6:10',  road:'H-1 East' },
+  { id:'2',  lat:21.2687, lng:-157.7043, name:'Hanauma Bay',             color:'#378ADD', seg:'East coast',     dist:'~11 km', dur:'15 min',         clock:'6:10 → 6:25',  road:'Hwy 72' },
+  { id:'3',  lat:21.2815, lng:-157.6722, name:'Halona Blowhole',         color:'#378ADD', seg:'East coast',     dist:'~3 km', dur:'5 min',          clock:'6:25 → 6:30',  road:'Hwy 72' },
+  { id:'4',  lat:21.3099, lng:-157.6526, name:"Sandy Beach / Makapu'u",  color:'#378ADD', seg:'East coast',     dist:'~5 km', dur:'8 min',          clock:'6:30 → 6:38',  road:'Hwy 72' },
+  { id:'5',  lat:21.3511, lng:-157.7393, name:'Waimanalo / Kailua',      color:'#1D9E75', seg:'Windward coast', dist:'~13 km', dur:'15 min',         clock:'6:38 → 6:53',  road:'Hwy 72' },
+  { id:'6',  lat:21.3927, lng:-157.7983, name:"Kāne'ohe / Byodo-In",    color:'#1D9E75', seg:'Windward coast', dist:'~13 km', dur:'18 min',         clock:'6:53 → 7:11',  road:'Hwy 61 / 83' },
+  { id:'7',  lat:21.5175, lng:-157.8376, name:'Kualoa Regional Park',    color:'#1D9E75', seg:'Windward coast', dist:'~18 km',dur:'20 min',         clock:'7:11 → 7:31',  road:'Hwy 83 N' },
+  { id:'8',  lat:21.6817, lng:-157.9557, name:'Kahuku / Shrimp Trucks',  color:'#1D9E75', seg:'Windward coast', dist:'~24 km',dur:'25 min',         clock:'7:31 → 7:56',  road:'Hwy 83 N' },
+  { id:'9',  lat:21.6417, lng:-158.0619, name:'Waimea Bay',              color:'#EF9F27', seg:'North Shore',    dist:'~16 km',dur:'15 min',         clock:'7:56 → 8:11',  road:'Hwy 83 W' },
+  { id:'10', lat:21.6632, lng:-158.0519, name:'Sunset Beach / Pipeline', color:'#EF9F27', seg:'North Shore',    dist:'~6 km', dur:'8 min',          clock:'8:11 → 8:19',  road:'Kamehameha Hwy' },
+  { id:'11', lat:21.5946, lng:-158.1053, name:"Haleiwa Town",            color:'#EF9F27', seg:'North Shore',    dist:'~8 km', dur:'10 min',         clock:'8:19 → 8:29',  road:'Kamehameha Hwy' },
+  { id:'12', lat:21.5259, lng:-158.1554, name:'Dole Plantation',         color:'#EF9F27', seg:'North Shore',    dist:'~11 km', dur:'12 min',         clock:'8:29 → 8:41',  road:'Kamehameha Hwy' },
+  { id:'F',  lat:21.2793, lng:-157.8290, name:'Waikiki (Finish)',        color:'#888780', seg:'Return',         dist:'~56 km',dur:'45–60 min',      clock:'8:41 → ~9:30', road:'H-2 S → H-1 E' },
+];
+
+// Approximate driving path coords (counterclockwise around Oahu)
+const routeCoords = [
+  // Waikiki start
+  [21.2793,-157.8290],
+  // East along H-1 to Diamond Head
+  [21.2680,-157.8190],[21.2612,-157.8044],
+  // Hwy 72 south coast
+  [21.2630,-157.7800],[21.2687,-157.7043],
+  [21.2750,-157.6900],[21.2815,-157.6722],
+  [21.2980,-157.6600],[21.3099,-157.6526],
+  // Up windward coast
+  [21.3200,-157.6580],[21.3511,-157.7393],
+  [21.3750,-157.7600],[21.3927,-157.7983],
+  [21.4300,-157.8100],[21.4650,-157.8200],
+  [21.5175,-157.8376],[21.5800,-157.8700],
+  [21.6200,-157.9100],[21.6817,-157.9557],
+  // North Shore west
+  [21.6700,-157.9900],[21.6500,-158.0300],
+  [21.6417,-158.0619],[21.6500,-158.0519],
+  [21.6632,-158.0519],[21.6300,-158.0700],
+  [21.5946,-158.1053],[21.5400,-158.1400],
+  [21.5259,-158.1554],
+  // Return via H-2 inland
+  [21.5000,-158.1200],[21.4700,-158.0500],
+  [21.4000,-157.9800],[21.3500,-157.9300],
+  [21.3100,-157.8700],[21.2793,-157.8290],
+];
+
+// Segment colour map for polyline segments
+const segColors = {
+  'East coast': '#378ADD',
+  'Windward coast': '#1D9E75',
+  'North Shore': '#EF9F27',
+  'Return': '#888780',
+};
+
+// Init map centred on Oahu
+const map = L.map('map', { zoomControl: true }).setView([21.45, -157.95], 11);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 18,
+  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+// Draw route polyline (full loop, single colour gradient workaround: split by segment)
+// Draw the full path in segments between stop indices
+const segBoundaries = [
+  { from: 0, to: 4,  color: '#378ADD' }, // Waikiki to Makapu'u — east
+  { from: 4, to: 8,  color: '#1D9E75' }, // Kailua to Kahuku — windward
+  { from: 8, to: 12, color: '#EF9F27' }, // Waimea to Dole — north shore
+  { from: 12,to: 13, color: '#888780' }, // Dole back to Waikiki — return
+];
+
+// Rough coordinate slices for each segment along routeCoords
+const segSlices = [
+  routeCoords.slice(0, 12),   // east
+  routeCoords.slice(11, 20),  // windward
+  routeCoords.slice(19, 29),  // north shore
+  routeCoords.slice(28),      // return
+];
+
+const segColorsArr = ['#378ADD','#1D9E75','#EF9F27','#888780'];
+
+segSlices.forEach((coords, i) => {
+  L.polyline(coords, {
+    color: segColorsArr[i],
+    weight: 5,
+    opacity: 0.85,
+    lineJoin: 'round',
+    lineCap: 'round'
+  }).addTo(map);
+});
+
+// Direction arrow decorator (simple via polyline)
+// Create custom numbered markers
+function makeIcon(stop) {
+  const isStartFinish = stop.id === 'S' || stop.id === 'F';
+  const bg = stop.color;
+  const border = stop.id === 'F' ? '#444441' : stop.color;
+  const size = isStartFinish ? 34 : 28;
+  const fontSize = isStartFinish ? 11 : 10;
+  const label = stop.id;
+
+  const svg = `
+    <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="${size/2}" cy="${size/2}" r="${size/2-1}" fill="${bg}" stroke="white" stroke-width="2"/>
+      <text x="${size/2}" y="${size/2+1}" text-anchor="middle" dominant-baseline="middle"
+        font-family="DM Mono, monospace" font-size="${fontSize}" font-weight="600" fill="white">${label}</text>
+    </svg>`;
+
+  return L.divIcon({
+    html: svg,
+    className: '',
+    iconSize: [size, size],
+    iconAnchor: [size/2, size/2],
+    popupAnchor: [0, -(size/2 + 4)],
+  });
+}
+
+// Add markers with popups
+stops.forEach(stop => {
+  // Skip duplicate Waikiki finish (same coords as start, offset slightly)
+  const lat = stop.id === 'F' ? stop.lat + 0.003 : stop.lat;
+  const lng = stop.id === 'F' ? stop.lng - 0.003 : stop.lng;
+
+  const popupHtml = `
+    <div class="popup-name">${stop.name}</div>
+    <div class="popup-row">
+      <span>${stop.seg}</span>
+    </div>
+    ${stop.dist !== '—' ? `<div class="popup-row">
+      <span>📍 ${stop.dist}</span>
+      <span>⏱ ${stop.dur}</span>
+    </div>` : `<div class="popup-row"><span>${stop.dur}</span></div>`}
+    ${stop.clock ? `<div class="popup-row"><span>🕐 ${stop.clock}</span></div>` : ''}
+    ${stop.road ? `<div class="popup-row"><span style="background:rgba(0,0,0,0.07);padding:2px 6px;border-radius:3px;">${stop.road}</span></div>` : ''}
+  `;
+
+  L.marker([lat, lng], { icon: makeIcon(stop) })
+    .addTo(map)
+    .bindPopup(popupHtml, { maxWidth: 240 });
+});
+
+// Add midpoint labels for each driving leg
+const legLabels = [
+  { lat:21.2640, lng:-157.7550, text:'15 min · Hwy 72', color:'#378ADD' },
+  { lat:21.2860, lng:-157.6700, text:'5 min',           color:'#378ADD' },
+  { lat:21.3300, lng:-157.6900, text:'15 min',          color:'#1D9E75' },
+  { lat:21.4600, lng:-157.8150, text:'20 min · Hwy 83', color:'#1D9E75' },
+  { lat:21.6050, lng:-157.9150, text:'25 min',          color:'#1D9E75' },
+  { lat:21.6550, lng:-158.0560, text:'15 min',          color:'#EF9F27' },
+  { lat:21.6300, lng:-158.0850, text:'10 min',          color:'#EF9F27' },
+  { lat:21.4300, lng:-157.9800, text:'45–60 min · H-2 return', color:'#888780' },
+];
+
+legLabels.forEach(l => {
+  L.marker([l.lat, l.lng], {
+    icon: L.divIcon({
+      html: `<div style="background:white;border:1.5px solid ${l.color};color:${l.color};font-family:'DM Mono',monospace;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,0.12)">${l.text}</div>`,
+      className: '',
+      iconAnchor: [0, 10],
+    }),
+    interactive: false,
+    zIndexOffset: -100,
+  }).addTo(map);
+});
+</script>
+</body>
+</html>
