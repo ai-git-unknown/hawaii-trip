@@ -96,6 +96,13 @@
 
   .footer { text-align:center; padding:24px; font-size:11px; font-family:'DM Mono',monospace; color:var(--ink3); letter-spacing:0.06em; }
 
+  /* HERO LINK */
+  .hero-link { padding: 16px 32px 8px; background: var(--ocean); }
+  .link-btn { display:inline-flex; align-items:center; gap:10px; padding:12px 20px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff; text-decoration:none; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; transition:background 0.15s, border-color 0.15s; }
+  .link-btn:hover { background:rgba(255,255,255,0.2); border-color:rgba(255,255,255,0.4); }
+  .link-arrow { font-size:16px; margin-left:4px; }
+  @media (max-width:480px) { .hero-link { padding:12px 16px 4px; } .link-btn { padding:10px 16px; font-size:13px; } }
+
   /* LEAFLET custom popup */
   .leaflet-popup-content-wrapper { border-radius: 8px; font-family: 'DM Sans', sans-serif; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
   .leaflet-popup-content { margin: 10px 14px; font-size: 13px; line-height: 1.5; min-width: 160px; }
@@ -126,6 +133,13 @@
     <div class="hero-divider"></div>
     <div class="hero-stat"><span class="hero-stat-val">~9:30 AM</span><span class="hero-stat-label">Back in Waikiki</span></div>
   </div>
+
+<div class="hero-link">
+  <a href="shopping-activities.html" class="link-btn">
+    <span>🛍️🍽️🎯</span>
+    <span>Shopping, Food & Activities Map</span>
+    <span class="link-arrow">→</span>
+  </a>
 </div>
 
 <div class="progress-bar">
@@ -315,7 +329,7 @@
   </div>
 </div>
 
-<div class="footer">Oahu · Counterclockwise Circle Drive · Drive times only</div>
+<div class="footer">Oahu · Counterclockwise Circle Drive · Drive times only · <a href="shopping-activities.html" style="color:var(--ink3); text-decoration:underline;">Shopping, Food & Activities Map</a></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
