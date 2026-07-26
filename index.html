@@ -41,9 +41,19 @@
   .leg-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
 
   /* MAP */
-  #map-wrap { background: var(--paper); border-bottom: 1px solid var(--border); }
+  #map-wrap { background: var(--paper); border-bottom: 1px solid var(--border); position: relative; }
   #map { height: 460px; width: 100%; }
   .map-label { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink3); padding: 10px 20px 8px; }
+  .fs-btn { position:absolute; top:10px; right:10px; z-index:1000; width:36px; height:36px; border-radius:8px; background:var(--paper); border:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.1); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; color:var(--ink); transition:background 0.15s, border-color 0.15s; }
+  .fs-btn:hover { background:var(--sand); border-color:var(--ink2); }
+  .fs-btn:focus { outline:2px solid var(--ocean); outline-offset:2px; }
+  .fs-btn svg { width:20px; height:20px; }
+  #map.fullscreen-mode { position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:9999; background:var(--paper); }
+  #map.fullscreen-mode + .map-label { display:none; }
+  #map.fullscreen-mode ~ .fs-btn { display:none; }
+  .fs-btn .fs-exit { display:none; }
+  #map.fullscreen-mode ~ .fs-btn .fs-enter { display:none; }
+  #map.fullscreen-mode ~ .fs-btn .fs-exit { display:inline; }
 
   /* MAIN */
   .main { max-width: 720px; margin: 0 auto; padding: 0 20px 60px; }
@@ -157,6 +167,14 @@
 <div id="map-wrap">
   <div class="map-label">Interactive route map — click any marker for details</div>
   <div id="map"></div>
+  <button class="fs-btn" id="fs-btn" aria-label="Toggle fullscreen" title="Fullscreen">
+    <span class="fs-enter">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+    </span>
+    <span class="fs-exit">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path></svg>
+    </span>
+  </button>
 </div>
 
 <div class="main">
@@ -497,6 +515,54 @@ legLabels.forEach(l => {
     zIndexOffset: -100,
   }).addTo(map);
 });
+
+// Fullscreen control
+L.Control.FullScreen = L.Control.extend({
+  options: { position: 'topright' },
+  onAdd: function(map) {
+    const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+    container.style.backgroundColor = 'white';
+    container.style.width = '34px';
+    container.style.height = '34px';
+    container.style.cursor = 'pointer';
+    container.style.display = 'flex';
+    container.style.alignItems = 'center';
+    container.style.justifyContent = 'center';
+    container.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#1A1A1A"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>';
+    container.title = 'Fullscreen';
+    L.DomEvent.on(container, 'click', function() {
+      const mapWrap = document.getElementById('map-wrap');
+      const mapEl = document.getElementById('map');
+      if (!document.fullscreenElement) {
+        if (mapWrap.requestFullscreen) mapWrap.requestFullscreen();
+        container.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#1A1A1A"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h3a2 2 0 0 1 2 2v3M3 16h3a2 2 0 0 1 2-2v-3m0-18v3a2 2 0 0 1-2 2H3"></path></svg>';
+        container.title = 'Exit fullscreen';
+        mapWrap.style.zIndex = '9999';
+        mapWrap.style.position = 'fixed';
+        mapWrap.style.top = '0';
+        mapWrap.style.left = '0';
+        mapWrap.style.width = '100vw';
+        mapWrap.style.height = '100vh';
+        mapEl.style.height = '100vh';
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+        container.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#1A1A1A"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>';
+        container.title = 'Fullscreen';
+        mapWrap.style.zIndex = '';
+        mapWrap.style.position = '';
+        mapWrap.style.top = '';
+        mapWrap.style.left = '';
+        mapWrap.style.width = '';
+        mapWrap.style.height = '';
+        mapEl.style.height = '460px';
+      }
+      setTimeout(() => map.invalidateSize(), 100);
+    });
+    return container;
+  }
+});
+
+map.addControl(new L.Control.FullScreen());
 </script>
 </body>
 </html>
