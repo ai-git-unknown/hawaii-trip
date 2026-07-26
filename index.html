@@ -28,17 +28,15 @@
   .hero-stat-label { font-size:10px; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:0.08em; font-family:'DM Mono',monospace; }
   .hero-divider { width:1px; height:32px; background:rgba(255,255,255,0.2); align-self:center; }
 
-  /* PROGRESS BAR */
-  .progress-bar { display:flex; height:5px; }
-  .pb-east  { background:#378ADD; flex:2; }
-  .pb-wind  { background:#1D9E75; flex:2; }
-  .pb-north { background:#EF9F27; flex:1.3; }
-  .pb-ret   { background:#888780; flex:1.5; }
-
-  /* LEGEND */
-  .legend { display:flex; flex-wrap:wrap; gap:14px; padding:14px 20px; background:var(--paper); border-bottom:1px solid var(--border); }
-  .leg-item { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--ink2); font-family:'DM Mono',monospace; }
-  .leg-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  /* SEGMENT BAR (like filter-bar) */
+  .segment-bar { display:flex; flex-wrap:wrap; gap:10px; padding:14px 20px; background:var(--paper); border-bottom:1px solid var(--border); }
+  .segment-btn { font-family:'DM Mono',monospace; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; padding:8px 14px; border-radius:6px; border:none; cursor:pointer; transition:all 0.15s; background:rgba(0,0,0,0.05); color:var(--ink2); }
+  .segment-btn.east   { background:#E6F1FB; color:#0C447C; border:1px solid #B5D4F4; }
+  .segment-btn.wind   { background:#E1F5EE; color:#085041; border:1px solid #9FE1CB; }
+  .segment-btn.north  { background:#FAEEDA; color:#633806; border:1px solid #FAC775; }
+  .segment-btn.ret    { background:#F1EFE8; color:#444441; border:1px solid #D3D1C7; }
+  .segment-btn:hover { opacity:0.85; }
+  .segment-btn.total { margin-left:auto; background:var(--ink); color:#fff; }
 
   /* MAP */
   #map-wrap { background: var(--paper); border-bottom: 1px solid var(--border); }
@@ -94,8 +92,6 @@
   .tip-text { font-size:13px; color:var(--ink2); line-height:1.55; }
   .tip-text strong { color:var(--ink); font-weight:600; display:block; margin-bottom:2px; }
 
-  .footer { text-align:center; padding:24px; font-size:11px; font-family:'DM Mono',monospace; color:var(--ink3); letter-spacing:0.06em; }
-
   /* HERO LINK */
   .hero-link { padding: 16px 32px 8px; background: var(--ocean); }
   .link-btn { display:inline-flex; align-items:center; gap:10px; padding:12px 20px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff; text-decoration:none; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; transition:background 0.15s, border-color 0.15s; }
@@ -115,6 +111,7 @@
     .hero-divider { display:none; }
     .main { padding:0 12px 48px; }
     #map { height: 320px; }
+    .segment-btn { padding:6px 10px; font-size:10px; }
   }
 </style>
 </head>
@@ -133,6 +130,7 @@
     <div class="hero-divider"></div>
     <div class="hero-stat"><span class="hero-stat-val">~9:30 AM</span><span class="hero-stat-label">Back in Waikiki</span></div>
   </div>
+</div>
 
 <div class="hero-link">
   <a href="shopping-activities.html" class="link-btn">
@@ -142,15 +140,12 @@
   </a>
 </div>
 
-<div class="progress-bar">
-  <div class="pb-east"></div><div class="pb-wind"></div><div class="pb-north"></div><div class="pb-ret"></div>
-</div>
-
-<div class="legend">
-  <div class="leg-item"><div class="leg-dot" style="background:#378ADD"></div>East coast — Hwy 72</div>
-  <div class="leg-item"><div class="leg-dot" style="background:#1D9E75"></div>Windward coast — Hwy 83</div>
-  <div class="leg-item"><div class="leg-dot" style="background:#EF9F27"></div>North Shore</div>
-  <div class="leg-item"><div class="leg-dot" style="background:#888780"></div>Return — H-2 / H-1</div>
+<div class="segment-bar" role="group" aria-label="Route segments">
+  <button class="segment-btn east">East coast — Hwy 72</button>
+  <button class="segment-btn wind">Windward coast — Hwy 83</button>
+  <button class="segment-btn north">North Shore</button>
+  <button class="segment-btn ret">Return — H-2 / H-1</button>
+  <button class="segment-btn total">~210 km · 3.5–4.5 hrs</button>
 </div>
 
 <!-- MAP -->
@@ -300,7 +295,7 @@
     <span class="total-label">Total loop</span>
     <div>
       <div class="total-val">~3.5 – 4.5 hrs</div>
-      <div class="total-sub">~210 kmles · no stops · starts 6:00 AM</div>
+      <div class="total-sub">~210 km · no stops · starts 6:00 AM</div>
     </div>
   </div>
 
@@ -396,15 +391,6 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 // Draw route polyline (full loop, single colour gradient workaround: split by segment)
-// Draw the full path in segments between stop indices
-const segBoundaries = [
-  { from: 0, to: 4,  color: '#378ADD' }, // Waikiki to Makapu'u — east
-  { from: 4, to: 8,  color: '#1D9E75' }, // Kailua to Kahuku — windward
-  { from: 8, to: 12, color: '#EF9F27' }, // Waimea to Dole — north shore
-  { from: 12,to: 13, color: '#888780' }, // Dole back to Waikiki — return
-];
-
-// Rough coordinate slices for each segment along routeCoords
 const segSlices = [
   routeCoords.slice(0, 12),   // east
   routeCoords.slice(11, 20),  // windward
@@ -424,7 +410,6 @@ segSlices.forEach((coords, i) => {
   }).addTo(map);
 });
 
-// Direction arrow decorator (simple via polyline)
 // Create custom numbered markers
 function makeIcon(stop) {
   const isStartFinish = stop.id === 'S' || stop.id === 'F';
@@ -452,7 +437,6 @@ function makeIcon(stop) {
 
 // Add markers with popups
 stops.forEach(stop => {
-  // Skip duplicate Waikiki finish (same coords as start, offset slightly)
   const lat = stop.id === 'F' ? stop.lat + 0.003 : stop.lat;
   const lng = stop.id === 'F' ? stop.lng - 0.003 : stop.lng;
 
