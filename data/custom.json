@@ -1,0 +1,15 @@
+[
+  {
+    "id": "custom1",
+    "name": "Your Custom Spot",
+    "category": "food",
+    "address": "123 Your Street, Honolulu",
+    "description": "Add your description here",
+    "hours": "Daily 9AM–5PM",
+    "price": "$$",
+    "url": "https://example.com",
+    "badge": "Custom",
+    "lat": 21.3,
+    "lng": -157.8
+  }
+]

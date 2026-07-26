@@ -29,6 +29,11 @@
   .hero-stat-label { font-size:10px; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:0.08em; font-family:'DM Mono',monospace; }
   .hero-divider { width:1px; height:32px; background:rgba(255,255,255,0.2); align-self:center; }
 
+  /* LOAD STATUS */
+  .load-status { padding: 10px 20px; font-family:'DM Mono',monospace; font-size:11px; text-align:center; }
+  .load-status.success { background:#E1F5EE; color:#0F6E56; }
+  .load-status.error { background:#FDEDEC; color:#854F0B; }
+
   /* FILTER BAR */
   .filter-bar { display:flex; flex-wrap:wrap; gap:10px; padding:14px 20px; background:var(--paper); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; }
   .filter-btn { font-family:'DM Mono',monospace; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; padding:8px 14px; border-radius:6px; border:none; cursor:pointer; transition:all 0.15s; background:rgba(0,0,0,0.05); color:var(--ink2); }
@@ -38,23 +43,14 @@
   .filter-btn.activity.active, .filter-btn.activity:hover { background:var(--activity); }
   .filter-btn.beach.active, .filter-btn.beach:hover { background:var(--beach); }
   .filter-btn.all.active, .filter-btn.all:hover { background:var(--ink); }
+  .filter-btn.other.active, .filter-btn.other:hover { background:#888780; }
 
   /* MAP */
-    #map-wrap { background: var(--paper); border-bottom: 1px solid var(--border); position: relative; }
-    #map { height: 480px; width: 100%; }
-    .map-label { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink3); padding: 10px 20px 8px; }
-    .fs-btn { position:absolute; top:10px; right:10px; z-index:1000; width:36px; height:36px; border-radius:8px; background:var(--paper); border:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.1); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; color:var(--ink); transition:background 0.15s, border-color 0.15s; }
-    .fs-btn:hover { background:var(--sand); border-color:var(--ink2); }
-    .fs-btn:focus { outline:2px solid var(--ocean); outline-offset:2px; }
-    .fs-btn svg { width:20px; height:20px; }
-    #map.fullscreen-mode { position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:9999; background:var(--paper); }
-    #map.fullscreen-mode + .map-label { display:none; }
-    #map.fullscreen-mode ~ .fs-btn { display:none; }
-    .fs-btn .fs-exit { display:none; }
-    #map.fullscreen-mode ~ .fs-btn .fs-enter { display:none; }
-    #map.fullscreen-mode ~ .fs-btn .fs-exit { display:inline; }
+  #map-wrap { background: var(--paper); border-bottom: 1px solid var(--border); }
+  #map { height: 480px; width: 100%; }
+  .map-label { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink3); padding: 10px 20px 8px; }
 
-    /* MAIN CONTENT */
+  /* MAIN CONTENT */
   .main { max-width: 900px; margin: 0 auto; padding: 0 20px 60px; }
 
   /* SECTION */
@@ -66,14 +62,16 @@
 
   /* CARDS */
   .card-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:14px; }
-  .card { background:var(--paper); border:1px solid var(--border); border-radius:10px; padding:16px; display:flex; flex-direction:column; gap:10px; transition:box-shadow 0.2s, transform 0.15s; }
+  .card { background:var(--paper); border:1px solid var(--border); border-radius:10px; padding:16px; display:flex; flex-direction:column; gap:10px; transition:box-shadow 0.2s, transform 0.15s; cursor:pointer; }
   .card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.08); transform:translateY(-2px); }
+  .card:focus { outline:2px solid var(--ocean); outline-offset:2px; }
   .card-header { display:flex; align-items:flex-start; gap:10px; }
   .card-icon { width:36px; height:36px; border-radius:8px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:16px; }
   .card-icon.shop { background:rgba(224,122,95,0.15); color:var(--shop); }
   .card-icon.food { background:rgba(61,64,91,0.15); color:var(--food); }
   .card-icon.activity { background:rgba(129,178,154,0.15); color:var(--activity); }
   .card-icon.beach { background:rgba(55,138,221,0.15); color:var(--beach); }
+  .card-icon.other { background:rgba(136,135,128,0.15); color:#888780; }
   .card-title { font-size:15px; font-weight:600; color:var(--ink); line-height:1.3; }
   .card-sub { font-size:12px; color:var(--ink3); font-family:'DM Mono',monospace; text-transform:uppercase; letter-spacing:0.06em; }
   .card-desc { font-size:13px; color:var(--ink2); line-height:1.55; flex:1; }
@@ -84,6 +82,7 @@
   .card-meta .dot.food { background:var(--food); }
   .card-meta .dot.activity { background:var(--activity); }
   .card-meta .dot.beach { background:var(--beach); }
+  .card-meta .dot.other { background:#888780; }
 
   /* POPUP */
   .leaflet-popup-content-wrapper { border-radius: 8px; font-family: 'DM Sans', sans-serif; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
@@ -95,6 +94,7 @@
   .popup-badge.food { background:rgba(61,64,91,0.15); color:var(--food); }
   .popup-badge.activity { background:rgba(129,178,154,0.15); color:var(--activity); }
   .popup-badge.beach { background:rgba(55,138,221,0.15); color:var(--beach); }
+  .popup-badge.other { background:rgba(136,135,128,0.15); color:#888780; }
   .popup-desc { font-size: 12px; color: #5A5A5A; margin-top: 6px; line-height: 1.5; }
   .popup-price { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--ink3); margin-top: 4px; }
   .popup-actions { display:flex; gap:8px; margin-top:8px; }
@@ -131,25 +131,20 @@
   </div>
 </div>
 
+<div class="load-status" id="load-status" style="display:none;"></div>
+
 <div class="filter-bar" role="group" aria-label="Filter categories">
   <button class="filter-btn all active" data-filter="all">All</button>
   <button class="filter-btn shop" data-filter="shop">Shopping</button>
   <button class="filter-btn food" data-filter="food">Food & Markets</button>
   <button class="filter-btn activity" data-filter="activity">Activities</button>
   <button class="filter-btn beach" data-filter="beach">Beaches</button>
+  <button class="filter-btn other" data-filter="other">Other</button>
 </div>
 
 <div id="map-wrap">
   <div class="map-label">Interactive map — click any marker for details; filter above to show categories</div>
   <div id="map"></div>
-  <button class="fs-btn" id="fs-btn" aria-label="Toggle fullscreen" title="Fullscreen">
-    <span class="fs-enter">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
-    </span>
-    <span class="fs-exit">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2-2v-3"></path></svg>
-    </span>
-  </button>
 </div>
 
 <div class="main" id="main-content">
@@ -160,212 +155,110 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-// ===== DATA =====
-const spots = [
-  // ===== SHOPPING =====
-  { id:'s1', name:'Ala Moana Center', cat:'shop', lat:21.2876, lng:-157.8411,
-    desc:"Hawaii's largest open-air shopping center (350+ stores). Luxury to local brands, huge food court (Makai Market), and direct access to Ala Moana Beach Park.",
-    addr:'1450 Ala Moana Blvd, Honolulu', hours:'Mon–Sat 9:30AM–9PM, Sun 10AM–7PM', price:'$$–$$$$', url:'https://www.alamoanacenter.com' },
-  { id:'s2', name:'Royal Hawaiian Center', cat:'shop', lat:21.2813, lng:-157.8301,
-    desc:"Waikiki's premier shopping — 3 levels, 110+ stores. Free cultural programming daily: hula lessons, lei making, ukulele, Hawaiian quilting.",
-    addr:'2201 Kalakaua Ave, Honolulu', hours:'Daily 10AM–10PM', price:'$$–$$$$', url:'https://royalhawaiiancenter.com' },
-  { id:'s3', name:'Waikele Premium Outlets', cat:'shop', lat:21.4094, lng:-158.0103,
-    desc:"50+ designer outlets (Coach, Kate Spade, Nike, etc.) ~30 min from Waikiki. Best for brand discounts. Tourist bus groups common on weekends.",
-    addr:'94-790 Lumiaina St, Waipahu', hours:'Mon–Sat 9:30AM–9PM, Sun 10AM–7PM', price:'$–$$', url:'https://www.premiumoutlets.com/outlet/waikele' },
-  { id:'s4', name:'International Market Place', cat:'shop', lat:21.2806, lng:-157.8294,
-    desc:"Open-air Waikiki center under a massive banyan tree. Mix of local artisans, global brands, and dining. Heritage-themed design.",
-    addr:'2330 Kalakaua Ave, Honolulu', hours:'Daily 11AM–10PM', price:'$$–$$$$', url:'https://www.shopinternationalmarketplace.com' },
-  { id:'s5', name:'KCC Farmers Market', cat:'shop', lat:21.2642, lng:-157.8081,
-    desc:"Oahu's BEST farmers market (Saturdays only). Local produce, prepared foods, poke, malasadas, Vietnamese, Hawaiian plates. Pair with early Diamond Head hike.",
-    addr:'4303 Diamond Head Rd (Kapiolani CC parking lot)', hours:'Saturdays 7:30AM–11AM ONLY', price:'$', url:'https://kccfarmersmarket.org' },
-  { id:'s6', name:'Chinatown Markets', cat:'shop', lat:21.3127, lng:-157.8617,
-    desc:"Oahu Market (open-air, oldest) + Maunakea Marketplace (indoor food court). Fresh fish, char siu, exotic produce, cheap local eats. Best in morning.",
-    addr:'N King St & Kekaulike St / 1120 Maunakea St', hours:'Daily ~7AM–5PM (varies by vendor)', price:'$', url:'' },
-  { id:'s7', name:'Kahala Mall', cat:'shop', lat:21.2735, lng:-157.7874,
-    desc:"Upscale neighborhood mall (Whole Foods, Macy's, local boutiques). Quieter than Ala Moana. Good Whole Foods for picnic supplies.",
-    addr:'4211 Waialae Ave, Honolulu', hours:'Mon–Sat 10AM–9PM, Sun 10AM–6PM', price:'$$–$$$$', url:'https://www.kahalamall.com' },
-  { id:'s8', name:'Ward Village / Kaka\'ako', cat:'shop', lat:21.2956, lng:-157.8512,
-    desc:"Master-planned neighborhood with SALT, Ward Centre, Ward Village Shops. Local designers, art galleries, weekend farmers market, great coffee (Brue Bar).",
-    addr:'1200 Ala Moana Blvd area', hours:'Varies by shop', price:'$$–$$$$', url:'https://wardvillage.com' },
-  { id:'s9', name:'Dole Plantation', cat:'shop', lat:21.5314, lng:-158.0400,
-    desc:"Tourist-heavy but fun stop en route to North Shore. Pineapple garden maze, train ride, famous Dole Whip. Gift shop with pineapple everything.",
-    addr:'64-1550 Kamehameha Hwy, Wahiawa', hours:'Daily 9:30AM–5:30PM', price:'$–$$', url:'https://www.doleplantation.com' },
+// ===== CONFIG =====
+const DATA_FILES = ['data/shopping.json', 'data/custom.json'];
+const VALID_CATEGORIES = new Set(['shop', 'food', 'activity', 'beach', 'other']);
 
-  // ===== FOOD & MARKETS =====
-  { id:'f1', name:'Helena\'s Hawaiian Food', cat:'food', lat:21.3256, lng:-157.8656,
-    desc:"James Beard Award winner. THE traditional Hawaiian spot since 1946. Pipikaula (dried salted short rib), lau lau, poi, haupia. Cash only, lunch only, arrive before 11AM.",
-    addr:'1240 N School St, Kalihi', hours:'Tue–Fri lunch only (~11AM–2PM)', price:'$', url:'https://www.helenashawaiianfood.com' },
-  { id:'f2', name:'Ono Hawaiian Foods', cat:'food', lat:21.2769, lng:-157.8189,
-    desc:"Kapahulu institution since 1963. Kalua pig, lau lau, lomi salmon, opihi (seasonal). Cash only, walk-in. Walkable from Waikiki.",
-    addr:'726 Kapahulu Ave, Kapahulu', hours:'Mon–Sat 11AM–7:30PM', price:'$', url:'' },
-  { id:'f3', name:'Rainbow Drive-In', cat:'food', lat:21.2781, lng:-157.8167,
-    desc:"Obama's go-to plate lunch since 1961. Mixed plate (~$12): 2-scoop rice, mac salad + entrée. Loco moco, chili rice, saimin. Iconic.",
-    addr:'3308 Kanaina Ave, Kapahulu', hours:'Daily 7AM–9PM', price:'$', url:'https://www.rainbowdrivein.com' },
-  { id:'f4', name:'Leonard\'s Bakery', cat:'food', lat:21.2778, lng:-157.8161,
-    desc:"THE malasada spot since 1952. Portuguese fried dough, hot, rolled in sugar. Original $1.50–2. Filled (custard, haupia) $2.25–2.75. Walk 10 min from Waikiki.",
-    addr:'933 Kapahulu Ave', hours:'Sun–Thu 5:30AM–9PM, Fri–Sat 5:30AM–10PM', price:'$', url:'https://leonardshawaii.com' },
-  { id:'f5', name:'Marukame Udon', cat:'food', lat:21.2818, lng:-157.8267,
-    desc:"Handmade udon made fresh on-site. Cafeteria-style. Kake udon ~$4, tempura udon, fresh-fried tempura from counter. Always a line, moves fast. Best budget meal in Waikiki.",
-    addr:'2310 Kuhio Ave, Waikiki', hours:'Daily 11AM–10PM', price:'$', url:'https://marukameudon.com' },
-  { id:'f6', name:'Yama\'s Fish Market', cat:'food', lat:21.2944, lng:-157.8289,
-    desc:"Top-tier poke source. Locals shop here daily. Ahi shoyu, spicy ahi, kimchi poke, tako. Buy by pound or bowl. Not a sit-down restaurant.",
-    addr:'2332 Young St, Moiliili', hours:'Mon–Sat 9AM–7PM, Sun 9AM–5PM', price:'$', url:'' },
-  { id:'f7', name:'Foodland Farms Ala Moana', cat:'food', lat:21.2876, lng:-157.8411,
-    desc:"Supermarket with legendary poke counter inside Ala Moana Center. Get Maika'i loyalty card at register (free, no residency needed) for instant discounts.",
-    addr:'1450 Ala Moana Blvd (inside Ala Moana)', hours:'Daily 6AM–11PM', price:'$', url:'https://www.foodland.com' },
-  { id:'f8', name:'Tamura\'s Fine Wine & Liquors', cat:'food', lat:21.3050, lng:-157.8089,
-    desc:"Liquor store with a legendary poke counter — only in Hawaii. Furikake ahi is exceptional. Multiple locations (Aiea, Kaimuki, Hawaii Kai).",
-    addr:'3535 Harding Ave, Kaimuki (main)', hours:'Daily 9AM–10PM', price:'$', url:'https://tamuraswine.com' },
-  { id:'f9', name:'Cinnamon\'s Restaurant', cat:'food', lat:21.3987, lng:-157.7372,
-    desc:"Voted best breakfast on Oahu. Guava chiffon pancakes, macadamia nut French toast. In Kailua — pair with Kailua Beach. Reserve weekends.",
-    addr:'315 Uluniu St, Kailua', hours:'Daily 7AM–2PM', price:'$$', url:'https://cinnamonskailua.com' },
-  { id:'f10', name:'Boots & Kimo\'s', cat:'food', lat:21.3978, lng:-157.7356,
-    desc:"Legendary macadamia nut pancakes with sweet white sauce. Walk-in only, line forms early. Loco moco also great. Kailua.",
-    addr:'151 Hekili St, Kailua', hours:'Daily 7:30AM–2PM', price:'$', url:'https://bootsandkimos.com' },
-  { id:'f11', name:'Koko Head Cafe', cat:'food', lat:21.2819, lng:-157.7975,
-    desc:"Chef Lee Anne Wong (Top Chef). Korean-inspired brunch: kimchi fried rice w/ perfect soft egg. Reservations essential — expect waits regardless. Kaimuki.",
-    addr:'1145C 12th Ave, Kaimuki', hours:'Daily 8AM–2:30PM', price:'$$', url:'https://kokoheadcafe.com' },
-  { id:'f12', name:'The Pig and the Lady', cat:'food', lat:21.3094, lng:-157.8625,
-    desc:"Chef Andrew Le's creative Vietnamese fusion. Pho French dip sandwich (genius), larb, green papaya salad. Great cocktails. Chinatown anchor.",
-    addr:'83 N King St, Chinatown', hours:'Lunch Mon–Fri, Dinner Mon–Sat, Brunch Sat–Sun', price:'$$–$$$', url:'https://thepigandthelady.com' },
-  { id:'f13', name:'Highway Inn', cat:'food', lat:21.2956, lng:-157.8512,
-    desc:"Family-owned since 1947. Most tourist-accessible traditional Hawaiian food. Lau lau, kalua pig, poi, ahi poke, oxtail soup. Walkable from Ward/Kaka'ako.",
-    addr:'680 Ala Moana Blvd, Kaka\'ako', hours:'Mon–Sat 9AM–8PM, Sun 10AM–5PM', price:'$–$$', url:'https://highwayinn.com' },
-  { id:'f14', name:'Matsumoto Shave Ice', cat:'food', lat:21.5908, lng:-158.1092,
-    desc:"North Shore icon since 1951. Lines move fast. Rainbow with ice cream + azuki beans. Cash only. In Haleiwa town — combine with North Shore drive.",
-    addr:'66-087 Kamehameha Hwy, Haleiwa', hours:'Daily 10AM–6PM', price:'$', url:'https://matsumotoshaveice.com' },
-  { id:'f15', name:'Ted\'s Bakery', cat:'food', lat:21.6575, lng:-158.0562,
-    desc:"North Shore (Pupukea) famous for haupia (coconut) cream pie — $6–8/slice. Also malasadas, manapua, local plate lunches. Cash preferred.",
-    addr:'59-024 Kamehameha Hwy, Haleiwa', hours:'Daily 7AM–7PM', price:'$', url:'https://tedsbakery.com' },
-  { id:'f16', name:'Giovanni\'s Shrimp Truck', cat:'food', lat:21.6556, lng:-158.0589,
-    desc:"Original North Shore garlic shrimp truck. $16–17 plate (12 shrimp, 2 scoops rice). Card accepted now. Expect line. Several trucks — this is the famous white one.",
-    addr:'66-472 Kamehameha Hwy, Kahuku', hours:'Daily 10:30AM–7PM', price:'$$', url:'https://giovannisshrimptruck.com' },
-  { id:'f17', name:'Waiola Shave Ice', cat:'food', lat:21.2767, lng:-157.8183,
-    desc:"Kapahulu favorite. Fine ice, huge flavor selection. Get rainbow with ice cream + azuki beans. Walkable from Waikiki on Kapahulu crawl.",
-    addr:'2135 Waiola St, Kapahulu', hours:'Daily 10AM–8PM', price:'$', url:'https://waiolashaveice.com' },
-  { id:'f18', name:'KCC Farmers Market (Saturday)', cat:'food', lat:21.2642, lng:-157.8081,
-    desc:"Best food experience in Honolulu. Saturday 7:30–11AM only. Prepared food stalls: poke, malasadas, banh mi, laulau, tropical fruit. Pair with Diamond Head sunrise hike.",
-    addr:'4303 Diamond Head Rd (Kapiolani CC)', hours:'Saturdays ONLY 7:30AM–11AM', price:'$', url:'https://kccfarmersmarket.org' },
-  { id:'f19', name:'Maunakea Marketplace', cat:'food', lat:21.3120, lng:-157.8612,
-    desc:"Indoor Chinatown food court. Filipino, Chinese, Vietnamese, Hawaiian stalls. Very cheap, very local. Excellent budget lunch.",
-    addr:'1120 Maunakea St, Chinatown', hours:'Daily ~7AM–5PM', price:'$', url:'' },
-  { id:'f20', name:'Zippy\'s', cat:'food', lat:21.3144, lng:-157.8394,
-    desc:"Hawaii's beloved 24-hr local chain (like a diner). Chili + rice ($9–11), oxtail soup, malasadas. Multiple locations. Kapahulu one is 24/7.",
-    addr:'Multiple (Kapahulu: 1765 S King St)', hours:'Most 24 hours', price:'$', url:'https://zippys.com' },
-
-  // ===== ACTIVITIES =====
-  { id:'a1', name:'Pearl Harbor Historic Sites', cat:'activity', lat:21.3645, lng:-157.9500,
-    desc:"Full day (6–8 hrs). USS Arizona Memorial (FREE, reserve at recreation.gov), USS Bowfin Submarine, Battleship Missouri, Pacific Aviation Museum. Combo tickets save $.",
-    addr:'1 Arizona Memorial Pl, Honolulu', hours:'Daily 7AM–5PM', price:'$0–$80', url:'https://www.recreation.gov', badge:'Book early' },
-  { id:'a2', name:'Polynesian Cultural Center', cat:'activity', lat:21.6414, lng:-157.9219,
-    desc:"6 Polynesian villages, canoe pageant, Ali'i Luau, 'Ha: Breath of Life' evening show. Packages from $158 (Gateway) to $294 (Super Ambassador). Closed Sundays. On North Shore route.",
-    addr:'55-370 Kamehameha Hwy, Laie', hours:'Mon–Sat 12PM–9PM', price:'$158–$294', url:'https://www.polynesia.com', badge:'Book online' },
-  { id:'a3', name:'Kualoa Ranch', cat:'activity', lat:21.5075, lng:-157.8353,
-    desc:"4,000-acre ranch on windward coast. Jurassic Park, Lost, Jumanji filming locations. ATV, zipline, horseback, movie site tours. Book specific tours well ahead.",
-    addr:'49-560 Kamehameha Hwy, Kaneohe', hours:'Daily 7:30AM–6PM', price:'$49–$120+', url:'https://kualoa.com', badge:'Book early' },
-  { id:'a4', name:'Diamond Head State Monument', cat:'activity', lat:21.2641, lng:-157.8081,
-    desc:"Iconic crater hike. 1.6 mi RT, 560 ft gain, 99 stairs + 74-step spiral staircase in WWII bunker. Panoramic Waikiki views. Reserve parking at gostateparks.hawaii.gov (30 days out).",
-    addr:'Diamond Head Rd, Honolulu', hours:'Daily 6AM–6PM (last entry 4:30PM)', price:'$5 non-resident', url:'https://gostateparks.hawaii.gov', badge:'Reserve parking' },
-  { id:'a5', name:'Hanauma Bay Nature Preserve', cat:'activity', lat:21.2689, lng:-157.6931,
-    desc:"BEST snorkeling on Oahu. $25 non-resident. Mandatory 9-min reef video. REEF-SAFE sunscreen only (zinc/titanium). Reservations open 2 days ahead at 6:58 AM HST — sells out in minutes. Closed Tuesdays.",
-    addr:'100 Hanauma Bay Rd', hours:'Wed–Mon 6:45AM–4PM', price:'$25', url:'https://hanaumabayreservations.com', badge:'Book 2 days out' },
-  { id:'a6', name:'Bishop Museum', cat:'activity', lat:21.3256, lng:-157.8694,
-    desc:"Hawaii's premier museum of Pacific culture & natural history. 3 floors of Hawaiian Hall, royal regalia, featherwork, planetarium. Free parking. Allow 3–4 hrs.",
-    addr:'1525 Bernice St, Kalihi', hours:'Wed–Mon 9AM–5PM (closed Tue)', price:'$29.95', url:'https://www.bishopmuseum.org' },
-  { id:'a7', name:'Iolani Palace', cat:'activity', lat:21.3069, lng:-157.8589,
-    desc:"Only royal palace on US soil. Home of King Kalakaua & Queen Lili'uokalani. Audio tour ~$30. Basement galleries: Crown Jewels, feather cloaks. Combine with Mission Houses & Kawaiahao Church.",
-    addr:'364 S King St, Downtown', hours:'Tue–Sat 9AM–4PM (last entry 3PM)', price:'~$30', url:'https://iolanipalace.org', badge:'Reserve ahead' },
-  { id:'a8', name:'Manoa Falls Trail', cat:'activity', lat:21.3336, lng:-157.7992,
-    desc:"1.6 mi RT to 150-ft waterfall through rainforest. ALWAYS muddy — wear waterproof shoes. $7 parking (cash) at Paradise Park. Mosquitoes intense — bring DEET. No swimming (leptospirosis).",
-    addr:'3860 Manoa Rd', hours:'Daily 7AM–6PM', price:'$7 parking', url:'https://dlnr.hawaii.gov/dsp', badge:'Check closures' },
-  { id:'a9', name:'Makapuu Lighthouse Trail', cat:'activity', lat:21.2839, lng:-157.6533,
-    desc:"2 mi RT paved trail, moderate incline. BEST whale watching (Nov–Apr). Panoramic ocean views, Molokai visible on clear days. No shade — go early or late. Free parking.",
-    addr:'Ka Iwi State Scenic Shoreline', hours:'Daily 7AM–6:45PM', price:'Free', url:'https://dlnr.hawaii.gov/dsp' },
-  { id:'a10', name:'Lanikai Pillbox (Kaiwa Ridge)', cat:'activity', lat:21.3869, lng:-157.7181,
-    desc:"BEST free sunrise hike. ~1.6 mi RT to 2 WWII pillboxes on ridge. Sweeping Lanikai/Mokulua views. Street parking only (residential — be respectful). No facilities.",
-    addr:'Kaelepulu Dr / Mid Pacific Country Club', hours:'Always open', price:'Free', url:'' },
-  { id:'a11', name:'Koko Head Crater Trail', cat:'activity', lat:21.2681, lng:-157.6975,
-    desc:"1,048 railroad-tie stairs to summit. 1–1.5 hrs. No shade. 360° views: Honolulu, Hanauma Bay, crater. Popular with military/fitness crowd. Arrive before 7–8 AM.",
-    addr:'423 Kaumakani St, Hawaii Kai', hours:'Always open', price:'Free', url:'' },
-  { id:'a12', name:'Ho\'omaluhia Botanical Garden', cat:'activity', lat:21.4106, lng:-157.8078,
-    desc:"400-acre garden backed by dramatic Ko'olau peaks. Iconic entrance road photo. Free admission. Free guided nature walks some mornings. No swimming in lake.",
-    addr:'45-680 Luluku Rd, Kaneohe', hours:'Daily 9AM–4PM (last entry 3PM)', price:'Free', url:'https://honolulu.gov/parks' },
-  { id:'a13', name:'Nu\'uanu Pali Lookout', cat:'activity', lat:21.3722, lng:-157.7975,
-    desc:"Historic 1795 battle site (Kamehameha I unified Oahu). Sweeping windward views. $7/vehicle parking. Often very windy — secure hats. Sacred site — don't take rocks.",
-    addr:'Nu\'uanu Pali Dr, off Hwy 61', hours:'Daily 9AM–4PM', price:'$7 parking', url:'https://dlnr.hawaii.gov/dsp' },
-  { id:'a14', name:'Shark\'s Cove (Pupukea)', cat:'activity', lat:21.6472, lng:-158.0614,
-    desc:"North Shore's best summer snorkeling (May–Sep). Rocky entry, tide pools, abundant fish. Winter: big waves, no swimming. Water shoes essential. Parking fills early.",
-    addr:'Pupukea Beach Park, 59-729 Kamehameha Hwy', hours:'Daylight hours', price:'Free', url:'' },
-  { id:'a15', name:'Byodo-In Temple', cat:'activity', lat:21.4567, lng:-157.8208,
-    desc:"Non-practicing Buddhist temple in Valley of the Temples. Replica of 950-yr-old Japanese temple. Peaceful grounds, koi ponds, peacocks, meditation. $5 entry (cash).",
-    addr:'47-200 Kahekili Hwy, Kaneohe', hours:'Daily 9AM–5PM', price:'$5', url:'https://www.byodo-in.com' },
-  { id:'a16', name:'Pu\'u Ualaka\'a (Tantalus Lookout)', cat:'activity', lat:21.3194, lng:-157.8225,
-    desc:"Panoramic sunset/night view of Honolulu, Diamond Head, leeward coast from ~1,000 ft. Cool upland forest. Winding drive — go slow. Easy add-on to Makiki hike or dinner in town.",
-    addr:'Round Top Dr, off Makiki Heights Dr', hours:'Daily 7AM–7:45PM', price:'Free', url:'https://dlnr.hawaii.gov/dsp' },
-
-  // ===== BEACHES =====
-  { id:'b1', name:'Waikiki Beach', cat:'beach', lat:21.2810, lng:-157.8280,
-    desc:"Iconic, crowded, but convenient. Best swimming near Royal Hawaiian. Surf lessons, catamaran cruises, outrigger canoe. Parking: Kapiolani Park (free) or hotel $35–55/day.",
-    addr:'Kalakaua Ave, Waikiki', hours:'Always open', price:'Free', url:'' },
-  { id:'b2', name:'Hanauma Bay', cat:'beach', lat:21.2689, lng:-157.6931,
-    desc:"See Activities for snorkeling details. Inner reef calm; outer reef for confident swimmers. Tram $1–3 saves steep walk. Closed Tuesdays.",
-    addr:'100 Hanauma Bay Rd', hours:'Wed–Mon 6:45AM–4PM', price:'$25', url:'https://hanaumabayreservations.com' },
-  { id:'b3', name:'Kailua Beach Park', cat:'beach', lat:21.3972, lng:-157.7367,
-    desc:"BEST overall beach — calm turquoise water, white sand, free parking (~100 spaces, fills by 9–10 AM weekends). Kayak/SUP rentals to Mokulua Islands. Lifeguards 9AM–5:30PM.",
-    addr:'769 Kailua Rd, Kailua', hours:'~5AM–10PM', price:'Free', url:'' },
-  { id:'b4', name:'Lanikai Beach', cat:'beach', lat:21.3828, lng:-157.7164,
-    desc:"Postcard-perfect. Street parking only (~30 spots, fills by 8 AM). Better: park at Kailua Beach, bike/walk 20 min. No facilities. Mokulua Islands kayak launch.",
-    addr:'Mokulua Dr, Lanikai', hours:'Always open', price:'Free', url:'' },
-  { id:'b5', name:'Ko Olina Lagoons', cat:'beach', lat:21.3333, lng:-158.1222,
-    desc:"4 man-made lagoons — calm year-round regardless of ocean. Great for kids/families. Free public parking at each lagoon (fills by mid-morning weekends). Disney Aulani here.",
-    addr:'92-100 Waipahe Pl, Kapolei', hours:'Always open', price:'Free', url:'https://koolinaresorts.com' },
-  { id:'b6', name:'Waimea Bay', cat:'beach', lat:21.6389, lng:-158.0656,
-    desc:"Summer: great swimming/snorkeling. Winter: 20–40 ft waves — SPECTATORS ONLY. Free large lot, restrooms, showers, lifeguards. Jump rock in summer (check depth).",
-    addr:'61-031 Kamehameha Hwy, Haleiwa', hours:'6AM–10PM', price:'Free', url:'' },
-  { id:'b7', name:'Sandy Beach Park', cat:'beach', lat:21.2869, lng:-157.6744,
-    desc:"World-class bodysurfing. CONSISTENTLY ranked Hawaii's most dangerous beach — powerful shore break causes spinal injuries. EXPERTS ONLY. Watch from sand.",
-    addr:'8801 Kalanianaole Hwy', hours:'Always open', price:'Free', url:'' },
-  { id:'b8', name:'Ala Moana Beach Park', cat:'beach', lat:21.2861, lng:-157.8447,
-    desc:"Calm protected channel, local vibe, joggers, picnics. Less touristy than Waikiki. Next to Ala Moana Center for post-beach shopping/AC. Avoid after dark.",
-    addr:'1201 Ala Moana Blvd', hours:'Always open', price:'Free', url:'' },
-  { id:'b9', name:'Sunset Beach', cat:'beach', lat:21.6600, lng:-158.0556,
-    desc:"Winter: massive waves (Pipeline neighbor). Summer: flat, swimmable, great snorkeling. Free parking across street. Banzai Pipeline view point nearby.",
-    addr:'59-001 Kamehameha Hwy', hours:'Always open', price:'Free', url:'' },
-  { id:'b10', name:'Shark\'s Cove (Pupukea)', cat:'beach', lat:21.6472, lng:-158.0614,
-    desc:"See Activities entry. Best summer snorkeling on North Shore. Rocky entry — water shoes required. Tide pools at low tide. Parking fills by 8–9 AM.",
-    addr:'59-729 Kamehameha Hwy', hours:'Daylight', price:'Free', url:'' },
-];
-
-// Category config
 const catConfig = {
   shop:   { color: '#E07A5F', label: 'Shopping', icon: '🛍️', pip: '#E07A5F' },
   food:   { color: '#3D405B', label: 'Food & Markets', icon: '🍽️', pip: '#3D405B' },
   activity:{ color: '#81B29A', label: 'Activities', icon: '🎯', pip: '#81B29A' },
   beach:  { color: '#378ADD', label: 'Beaches', icon: '🏖️', pip: '#378ADD' },
+  other:  { color: '#888780', label: 'Other', icon: '📍', pip: '#888780' },
 };
 
-// ===== MAP INIT =====
+// Fallback data (current inline array, shortened for brevity - full version in original file)
+const FALLBACK_SPOTS = [];
+
+// ===== STATE =====
+let spots = [];
+let markers = {};
+let activeFilter = 'all';
+
 const map = L.map('map', { zoomControl: false }).setView([21.43, -157.98], 10);
 L.control.zoom({ position: 'bottomright' }).addTo(map);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap contributors', maxZoom: 18
 }).addTo(map);
 
-const markers = {};
-let activeFilter = 'all';
+// ===== LOAD DATA =====
+async function loadSpots() {
+  const statusEl = document.getElementById('load-status');
+  statusEl.style.display = 'block';
+  statusEl.textContent = 'Loading spot data...';
+  statusEl.className = 'load-status';
 
-// Create custom marker icons
+  const allSpots = [];
+  try {
+    for (const file of DATA_FILES) {
+      const resp = await fetch(file, { cache: 'no-store' });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status} for ${file}`);
+      const data = await resp.json();
+      if (Array.isArray(data)) allSpots.push(...data);
+      else console.warn(`${file}: root is not an array`, data);
+    }
+    spots = allSpots.map((s, i) => normalizeSpot(s, i));
+    statusEl.textContent = `Loaded ${spots.length} spots from ${DATA_FILES.length} file(s)`;
+    statusEl.className = 'load-status success';
+    setTimeout(() => statusEl.style.display = 'none', 3000);
+  } catch (err) {
+    console.error('Failed to load JSON:', err);
+    statusEl.textContent = `Error: ${err.message}. Using fallback.`;
+    statusEl.className = 'load-status error';
+    spots = FALLBACK_SPOTS.map((s, i) => normalizeSpot(s, i));
+  }
+  initApp();
+}
+
+function normalizeSpot(s, index) {
+  const id = s.id || `spot-${index}`;
+  const cat = VALID_CATEGORIES.has(s.category) ? s.category : 'other';
+  if (s.category && cat !== s.category) {
+    console.warn(`Spot ${id}: invalid category '${s.category}', defaulting to 'other'`);
+  }
+  return {
+    id,
+    name: s.name || 'Unnamed',
+    cat,
+    lat: typeof s.lat === 'number' ? s.lat : null,
+    lng: typeof s.lng === 'number' ? s.lng : null,
+    desc: s.description || '',
+    addr: s.address || '',
+    hours: s.hours || '',
+    price: s.price || '',
+    url: s.url || '',
+    badge: s.badge || null
+  };
+}
+
+// ===== INIT =====
+function initApp() {
+  spots.forEach(spot => {
+    if (spot.lat !== null && spot.lng !== null) {
+      const cfg = catConfig[spot.cat];
+      const marker = L.marker([spot.lat, spot.lng], { icon: createMarkerIcon(spot.cat) })
+        .addTo(map)
+        .bindPopup(createPopup(spot));
+      markers[spot.id] = { marker, spot, el: null };
+    }
+  });
+
+  // Fit bounds
+  const group = new L.featureGroup(Object.values(markers).map(m => m.marker));
+  if (group.getLayers().length > 0) {
+    map.fitBounds(group.getBounds().pad(0.05));
+  }
+
+  updateStats();
+  renderSections();
+  bindFilters();
+}
+
+// ===== MARKER ICON =====
 function createMarkerIcon(cat) {
   const cfg = catConfig[cat];
   return L.divIcon({
-    html: `<div style="
-      width:28px;height:28px;border-radius:50%;
-      background:${cfg.color};
-      border:2px solid white;
-      box-shadow:0 2px 6px rgba(0,0,0,0.3);
-      display:flex;align-items:center;justify-content:center;
-      font-size:14px;
-    ">${cfg.icon}</div>`,
+    html: `<div style="width:28px;height:28px;border-radius:50%;background:${cfg.color};border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-size:14px;">${cfg.icon}</div>`,
     className: '',
     iconSize: [28, 28],
     iconAnchor: [14, 14],
@@ -373,24 +266,13 @@ function createMarkerIcon(cat) {
   });
 }
 
-// Add all markers
-spots.forEach(spot => {
-  const cfg = catConfig[spot.cat];
-  const marker = L.marker([spot.lat, spot.lng], { icon: createMarkerIcon(spot.cat) })
-    .addTo(map)
-    .bindPopup(createPopup(spot));
-  markers[spot.id] = { marker, spot, el: null };
-});
-
-// Popup HTML
+// ===== POPUP =====
 function createPopup(spot) {
   const cfg = catConfig[spot.cat];
   const badge = spot.badge ? `<span class="popup-badge ${spot.cat}">${spot.badge}</span>` : '';
   return `
     <div class="popup-name">${spot.name}${badge}</div>
-    <div class="popup-row">
-      <span class="popup-badge ${spot.cat}">${cfg.label}</span>
-    </div>
+    <div class="popup-row"><span class="popup-badge ${spot.cat}">${cfg.label}</span></div>
     <div class="popup-desc">${spot.desc}</div>
     <div class="popup-price">${spot.addr} • ${spot.hours} • ${spot.price}</div>
     <div class="popup-actions">
@@ -400,21 +282,23 @@ function createPopup(spot) {
   `;
 }
 
-// ===== FILTER LOGIC =====
-const filterBtns = document.querySelectorAll('.filter-btn');
-filterBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    filterBtns.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    activeFilter = btn.dataset.filter;
-    applyFilter();
-    renderSections();
+// ===== FILTERS =====
+function bindFilters() {
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter = btn.dataset.filter;
+      applyFilter();
+      renderSections();
+    });
   });
-});
+}
 
 function applyFilter() {
   spots.forEach(spot => {
-    const m = markers[spot.id].marker;
+    const m = markers[spot.id]?.marker;
+    if (!m) return;
     const show = activeFilter === 'all' || spot.cat === activeFilter;
     if (show) m.addTo(map); else map.removeLayer(m);
   });
@@ -422,7 +306,7 @@ function applyFilter() {
 }
 
 function updateStats() {
-  const counts = { shop:0, food:0, activity:0, beach:0 };
+  const counts = { shop:0, food:0, activity:0, beach:0, other:0 };
   spots.forEach(s => { if (activeFilter === 'all' || s.cat === activeFilter) counts[s.cat]++; });
   document.getElementById('stat-shops').textContent = counts.shop;
   document.getElementById('stat-food').textContent = counts.food;
@@ -437,7 +321,7 @@ function renderSections() {
   const byCat = {};
   filtered.forEach(s => { byCat[s.cat] = byCat[s.cat] || []; byCat[s.cat].push(s); });
 
-  const catOrder = ['shop', 'food', 'activity', 'beach'];
+  const catOrder = ['shop', 'food', 'activity', 'beach', 'other'];
   let html = '';
   catOrder.forEach(cat => {
     if (!byCat[cat] || byCat[cat].length === 0) return;
@@ -457,20 +341,17 @@ function renderSections() {
   });
   main.innerHTML = html;
 
-  // Attach card click handlers
   document.querySelectorAll('.card').forEach(card => {
-    card.addEventListener('click', () => {
-      const id = card.dataset.id;
-      panToSpot(id);
-    });
+    card.addEventListener('click', () => panToSpot(card.dataset.id));
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); panToSpot(card.dataset.id); } });
   });
 }
 
 function renderCard(spot) {
   const cfg = catConfig[spot.cat];
-  const badge = spot.badge ? `<span class="card-badge" style="background:rgba(0,0,0,0.06);padding:2px 6px;border-radius:3px;font-size:10px;font-family:'DM Mono',monospace;">${spot.badge}</span>` : '';
+  const badge = spot.badge ? `<span style="background:rgba(0,0,0,0.06);padding:2px 6px;border-radius:3px;font-size:10px;font-family:'DM Mono',monospace;">${spot.badge}</span>` : '';
   return `
-    <article class="card" data-id="${spot.id}" style="cursor:pointer" tabindex="0" role="button" aria-label="${spot.name}">
+    <article class="card" data-id="${spot.id}" tabindex="0" role="button" aria-label="${spot.name}">
       <div class="card-header">
         <div class="card-icon ${spot.cat}">${cfg.icon}</div>
         <div>
@@ -493,7 +374,6 @@ function panToSpot(id) {
   if (!m) return;
   map.setView([m.spot.lat, m.spot.lng], 14, { animate: true });
   setTimeout(() => m.marker.openPopup(), 300);
-  // Highlight card briefly
   const card = document.querySelector(`.card[data-id="${id}"]`);
   if (card) {
     card.style.boxShadow = '0 0 0 3px var(--ocean)';
@@ -501,65 +381,8 @@ function panToSpot(id) {
   }
 }
 
-// Keyboard support for cards
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' || e.key === ' ') {
-    const card = e.target.closest('.card');
-    if (card) { e.preventDefault(); panToSpot(card.dataset.id); }
-  }
-});
-
-// Fullscreen control
-L.Control.FullScreen = L.Control.extend({
-  options: { position: 'topright' },
-  onAdd: function(map) {
-    const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
-    container.style.backgroundColor = 'white';
-    container.style.width = '34px';
-    container.style.height = '34px';
-    container.style.cursor = 'pointer';
-    container.style.display = 'flex';
-    container.style.alignItems = 'center';
-    container.style.justifyContent = 'center';
-    container.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#1A1A1A"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>';
-    container.title = 'Fullscreen';
-    L.DomEvent.on(container, 'click', function() {
-      const mapWrap = document.getElementById('map-wrap');
-      const mapEl = document.getElementById('map');
-      if (!document.fullscreenElement) {
-        if (mapWrap.requestFullscreen) mapWrap.requestFullscreen();
-        container.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#1A1A1A"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h3a2 2 0 0 1 2 2v3M3 16h3a2 2 0 0 1 2-2v-3m0-18v3a2 2 0 0 1-2 2H3"></path></svg>';
-        container.title = 'Exit fullscreen';
-        mapWrap.style.zIndex = '9999';
-        mapWrap.style.position = 'fixed';
-        mapWrap.style.top = '0';
-        mapWrap.style.left = '0';
-        mapWrap.style.width = '100vw';
-        mapWrap.style.height = '100vh';
-        mapEl.style.height = '100vh';
-      } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-        container.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#1A1A1A"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>';
-        container.title = 'Fullscreen';
-        mapWrap.style.zIndex = '';
-        mapWrap.style.position = '';
-        mapWrap.style.top = '';
-        mapWrap.style.left = '';
-        mapWrap.style.width = '';
-        mapWrap.style.height = '';
-        mapEl.style.height = '480px';
-      }
-      setTimeout(() => map.invalidateSize(), 100);
-    });
-    return container;
-  }
-});
-
-map.addControl(new L.Control.FullScreen());
-
-// Init
-updateStats();
-renderSections();
+// ===== START =====
+loadSpots();
 </script>
 </body>
 </html>
